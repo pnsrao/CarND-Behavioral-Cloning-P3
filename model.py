@@ -12,8 +12,7 @@ import numpy as np
 
 images = []
 measurements = []
-#basedirs = ['./data','./data_recovery','./data_recovery2','./data_curve']
-basedirs = ['./data']
+basedirs = ['./data','./data_recovery','./data_recovery2','./data_curve']
 num_cameras = 1
 path_separators = ['/','\\','/','\\']
 for index in range(len(basedirs)):
@@ -52,7 +51,7 @@ X_train = np.expand_dims(X_train,4)
 y_train = np.array(measurements)
 
 from keras.models import Sequential, load_model
-from keras.layers import Flatten, Dense, Lambda
+from keras.layers import Flatten, Dense, Lambda, Activation, Dropout
 from keras.layers.convolutional import Convolution2D
 from keras.layers import MaxPooling2D
 
@@ -61,19 +60,23 @@ if newModel:
     model = Sequential()
     model.add(Lambda(lambda x: x/255. - 0.5, input_shape=(160,320,1)))
     model.add(Convolution2D(6,5,5,activation="relu",dim_ordering='tf'))
-    model.add(MaxPooling2D())
-    model.add(Convolution2D(6,5,5,activation="relu",dim_ordering='tf'))
-    model.add(MaxPooling2D())
+    model.add(MaxPooling2D(pool_size=(2,2)))
+    model.add(Convolution2D(16,5,5,activation="relu",dim_ordering='tf'))
+    model.add(MaxPooling2D(pool_size=(2,2)))
     model.add(Flatten())
-    #model.add(Dense(120))
-    #model.add(Dense(84))
+    model.add(Dense(120))
+    model.add(Activation('relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(84))
+    model.add(Activation('relu'))
+    model.add(Dropout(0.5))
     model.add(Dense(1))
     model.compile(loss='mse', optimizer='adam')
 else:
     model = load_model('multmodel.h5')
 model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=2)
 
-model.save('schannelud.h5')
+model.save('lenetdo.h5')
 
 pmeasurements = []
 for index in range(len(measurements)):
