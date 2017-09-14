@@ -27,7 +27,6 @@ for index in range(len(basedirs)):
     lines.pop(0)
     for line in lines:
         for cam in range(num_cameras):
-        #cam = np.random.choice(range(3))
             sourcepath = line[cam]
             filename = sourcepath.split(path_separators[index])[-1]
             current_path = basedir + '/IMG/'+filename
@@ -35,7 +34,6 @@ for index in range(len(basedirs)):
             image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
             mychannels = cv2.split(image)
             image = mychannels[1]
-            #image = image[65:135,0:320]
             images.append(image)
             measurement = float(line[3])
             if cam==1:
@@ -76,7 +74,7 @@ else:
     model = load_model('multmodel.h5')
 model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=2)
 
-model.save('lenetdo.h5')
+model.save('model.h5')
 
 pmeasurements = []
 for index in range(len(measurements)):
